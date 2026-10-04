@@ -120,19 +120,24 @@ $ python app.py ask '...'
 **The three tools, tested one at a time**
 
 ```
-$ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
-
+$ python -c "from tools import search_listings; print([(item['title'], item['price']) for item in search_listings('graphic tee', max_price=30)])"
+[('Mesh Long-Sleeve Top — Black', 15.0), ('Y2K Baby Tee — Butterfly Print', 18.0), ('Vintage Band Tee — Faded Grey', 19.0), ('Graphic Tee — 2003 Tour Bootleg Style', 24.0), ('Vintage Graphic Hoodie — Faded Black', 26.0), ('Low-Rise Cargo Pants — Khaki', 27.0)]
 ```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
-
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_empty_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_empty_wardrobe()))"
+Here are two easy ways to style these classic vintage jeans: pair them with a white tee and canvas sneakers, or layer them with an open button-down and add simple accessories.
 ```
 
 ```
-$ python -c "from tools import create_fit_card; ..."
-
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; item = load_listings()[0]; print(create_fit_card('Pair it with a white tee and vintage sneakers.', item))"
+Nothing beats the broken-in feel of these Vintage Levi's 501 Jeans. I just scored them for $38 on Depop and paired them with a crisp white tee and retro sneakers for an effortless weekend uniform.
 ```
+
+The first fit-card test returned the same cached answer on all three runs. I
+then set `AI201_CACHE=0` for the process and ran the same command three more
+times; the captions used different wording while still mentioning the item,
+price, and platform.
 
 ---
 
