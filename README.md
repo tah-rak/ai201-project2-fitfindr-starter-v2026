@@ -59,24 +59,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Searches the listings data for clothing that matches the user's description, with optional size and price filters.
+- **Inputs:** `description` (`str`), `size` (`str | None`), and `max_price` (`float | None`, in dollars).
+- **Returns:** A list of matching listing dictionaries, each containing fields such as `id`, `title`, `description`, `size`, `price`, `colors`, `brand`, and `platform`, ordered from the best match to the weakest.
+- **When it has nothing:** Returns an empty list (`[]`).
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Suggests one or two outfits that work with the selected listing and the user's existing wardrobe.
+- **Inputs:** `new_item` (`dict`) and `wardrobe` (`dict` with an `items` list).
+- **Returns:** A non-empty outfit suggestion string with specific combinations from the wardrobe when wardrobe items are available.
+- **When it has nothing:** If the wardrobe has no items, returns general styling advice for the listing instead of failing.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Turns the selected item and outfit suggestion into a short caption suitable for sharing as a thrift find.
+- **Inputs:** `outfit` (`str`) and `new_item` (`dict` containing the item's `title`, `price`, and `platform`).
+- **Returns:** A two-to-four sentence caption that mentions the item, price, platform, and overall style or vibe.
+- **When it has nothing:** If `outfit` is empty or only whitespace, returns a descriptive message instead of trying to create a caption.
 
 ---
 
@@ -93,13 +93,13 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If `search_listings` returns an empty list, the agent puts a message in the session explaining what the user could change and stops before calling `suggest_outfit`. Otherwise, it stores the first result as the selected item and passes it to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** Regular expressions extract an optional `size` and `max_price`; the remaining words become the description used for searching.
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** The query is stored first, followed by the parsed description, size, and price. Search results are stored next, then the selected listing moves into `suggest_outfit` with the wardrobe. The outfit suggestion and selected listing finally move into `create_fit_card`, and all results remain in the session.
 
 ---
 
