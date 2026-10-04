@@ -39,9 +39,12 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
-
+FitFindr takes a plain-language request for a secondhand clothing item, such as
+"a vintage graphic tee under $30," and searches the local listings data. It
+chooses a matching listing, suggests ways to wear it with the user's wardrobe,
+and writes a short caption for the find. If the search is empty, it explains
+what the user could change and stops instead of sending an empty item to the
+next tool.
 
 ---
 
@@ -152,15 +155,31 @@ price, and platform.
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked AI to help me turn the tool specifications into
+     the three standalone functions in `tools.py`, especially the keyword search,
+     the empty-wardrobe case, and the empty-outfit case.
+- *What came back:* It helped me break the work into a data-only search tool
+     and two tools that call the existing `generate()` adapter. It also pointed
+     out that a size filter should match complete labels, so `M` can match `S/M`
+     without accidentally matching `XL`.
+- *What I changed:* I used `load_listings()` instead of reading the JSON file
+     directly, made no matches return `[]`, and added prompts that return general
+     styling advice when the wardrobe is empty. I tested each tool separately
+     before connecting them.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked AI to explain how to build the planning loop in
+     `agent.py` so the selected listing would move through session state rather
+     than being passed directly from one function call to the next.
+- *What came back:* It showed that the loop needed two different paths: an
+     empty search should set an error and return, while a non-empty search should
+     continue to the outfit and fit-card tools. It also helped me use regular
+     expressions to extract the optional size and maximum price from the query.
+- *What I changed:* I implemented the three stages in `run_agent()`, stored
+     every result in the session, read those stored values for the next call, and
+     checked both a successful query and an impossible query. The impossible
+     query now leaves `fit_card` as `None` and tells the user what to change.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
