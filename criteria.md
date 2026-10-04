@@ -25,9 +25,10 @@ Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
 **Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+The search uses keyword matching, so a reasonable request can be phrased in a
+way that misses the listing data. Four successful runs still shows that the
+full path usually works without pretending the search is more flexible than it
+is.
 
 ---
 
@@ -37,26 +38,23 @@ Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
 **Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+An empty result is deterministic once the filters have been applied. Stopping
+before the next tool is also the safety rule for this branch, so it should work
+every time rather than only most of the time.
 
 ---
 
 ## 3. Something about state
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
+For 5 of 5 matching runs, the `id` and `title` in
+`session["selected_item"]` must be identical to the `id` and `title` of the
+item passed to `suggest_outfit`.
 
 **Why this target:**
+The selected item is a single listing that should move through the session
+unchanged. Five out of five is appropriate because this is local state copying,
+not model-generated behavior, so there is no reason to accept occasional loss
+or substitution.
 
 
 
@@ -64,20 +62,13 @@ Given a query that matches no listings, the agent stops before calling
 
 ## 4. Something about the fit card
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
+In at least 4 of 5 successful runs, the fit card must be 2 to 4 sentences and
+must mention the selected item's title, price, and platform.
 
 **Why this target:**
+The model may choose different wording on different runs, so exact text is not
+a fair requirement. These length and content checks keep the result useful as a
+caption while allowing normal variation in model output.
 
 
 
@@ -85,16 +76,13 @@ Given a query that matches no listings, the agent stops before calling
 
 ## 5. Your choice
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
+For 5 of 5 searches with a `max_price`, every returned listing must have a
+`price` less than or equal to that limit.
 
 **Why this target:**
+The price ceiling is a direct numeric filter, so its behavior should be
+consistent every time. A 5-of-5 target makes sure the agent never recommends an
+item that violates the user's stated budget.
 
 
 
