@@ -263,22 +263,33 @@ that produced it:
 **Happy path**
 
 ```
-
+[1] search_listings (via MCP)
+     in:  dict with keys: description, size, max_price
+     out: 10 items: Y2K Baby Tee — Butterfly Print, Vintage Band Tee — Faded Grey, Graphic Tee — 2003 Tour Bootleg Style … +7 more
+     →    branch: results found, continuing
+[2] suggest_outfit
+     in:  dict with keys: new_item, wardrobe
+     out: Here are two realistic, easy-to-pull-off outfits using the Y2K butterfly baby tee: **1. Y2K Streetwear Contra…
+[3] create_fit_card
+     in:  dict with keys: outfit, new_item
+     out: Channeling peak 2000s energy with this sweet Y2K Baby Tee — Butterfly Print, paired here with baggy dark denim…
 ```
 
 **Empty search**
 
 ```
-
+[1] search_listings (via MCP)
+     in:  dict with keys: description, size, max_price
+     out: [] (empty)
+     →    branch: empty, stopping
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
-
-
-
+**On the MCP move:** `search_listings` is registered in `mcp_server.py` with
+the same `description`, `size`, and `max_price` inputs documented in the Tool
+Inventory. `agent.py` now calls it through `mcp_client.call_tool`; the server
+returned the same list-of-dictionaries shape, so the existing empty-search
+branch continued to work. The trace labels the call `search_listings (via MCP)`
+so the transport change is visible.
 ---
 
 ## The Improvement

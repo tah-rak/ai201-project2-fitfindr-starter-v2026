@@ -135,6 +135,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    trace.start_trace()
     next_step = "search"
     iteration = 0
 
@@ -153,6 +154,16 @@ def run_agent(query: str, wardrobe: dict) -> dict:
                     "max_price": parsed["max_price"],
                 },
             )
+            trace.step(
+                "search_listings (via MCP)",
+                inputs=parsed,
+                returned=session["search_results"],
+                note=(
+                    "branch: empty, stopping"
+                    if not session["search_results"]
+                    else "branch: results found, continuing"
+                ),
+            )
 
             if not session["search_results"]:
                 session["error"] = (
@@ -166,16 +177,59 @@ def run_agent(query: str, wardrobe: dict) -> dict:
             continue
 
         if next_step == "outfit":
-            session["outfit_suggestion"] = suggest_outfit(
-                session["selected_item"],
-                session["wardrobe"],
+            try:
+                session["outfit_suggestion"] = suggest_outfit(
+                    session["selected_item"],
+                    session["wardrobe"],
+                )
+            except ModelUnavailable:
+                session["error"] = (
+                    "The model could not be reached while creating the outfit "
+                    "suggestion. Check your API key or try again."
+                )
+                trace.step(
+                    "suggest_outfit",
+                    inputs={"new_item": session["selected_item"]},
+                    returned=session["error"],
+                )
+                return session
+            trace.step(
+                "suggest_outfit",
+                inputs={
+                    "new_item": session["selected_item"],
+                    "wardrobe": session["wardrobe"],
+                },
+                returned=session["outfit_suggestion"],
             )
             next_step = "fit_card"
             continue
 
-        session["fit_card"] = create_fit_card(
-            session["outfit_suggestion"],
-            session["selected_item"],
+        try:
+            session["fit_card"] = create_fit_card(
+                session["outfit_suggestion"],
+                session["selected_item"],
+            )
+        except ModelUnavailable:
+            session["error"] = (
+                "The model could not be reached while creating the fit card. "
+                "Check your API key or try again."
+            )
+            trace.step(
+                "create_fit_card",
+                inputs={
+                    "outfit": session["outfit_suggestion"],
+                    "new_item": session["selected_item"],
+                },
+                returned=session["error"],
+            )
+            return session
+        trace.step(
+            "create_fit_card",
+            inputs={
+                "outfit": session["outfit_suggestion"],
+                "new_item": session["selected_item"],
+            },
+            returned=session["fit_card"],
         )
         return session
 
