@@ -201,17 +201,46 @@ price, and platform.
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Matching query completes all three tools | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Impossible query stops before the second tool | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Selected item state is preserved | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card contains item details | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Price ceiling is respected | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
 ```
+Run file: results/run_2026-10-11_1730_before.md
+Produced by: run_eval.py::main
 
+Criterion 1 — matching query completes:
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+Fit card:
+Channeling major early 2000s mall rat energy with this Y2K Baby Tee — Butterfly Print. I love balancing the fitted crop with baggy denim and chunky sneakers for an effortless weekend look. Snagged this gem for just $18 over on Depop!
+
+Criterion 2 — impossible query stops early:
+- stopped early: yes — No matching listings found. Try changing the description, size, or maximum price.
+- selected_item: (none)
+- search_results: 0
+
+Criterion 3 — selected item state:
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+Trace from agent.py::run_agent:
+[1] search_listings (via MCP)
+[2] suggest_outfit
+[3] create_fit_card
+
+Criterion 4 — fit card contains item details:
+Channeling peak 2000s energy with this dreamy Y2K Baby Tee — Butterfly Print, paired with baggy dark-wash jeans and chunky sneakers for the ultimate casual street look. I just snagged it on Depop for $18, and it’s giving total early-2000s mall-rat nostalgia. Run, don't walk!
+
+Criterion 5 — price ceiling:
+Output from mcp_client.call_tool("search_listings", ...):
+prices: [42.0, 24.0, 27.0, 30.0, 33.0, 38.0, 45.0]
+over_budget: []
 ```
 
 ---
