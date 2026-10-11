@@ -265,14 +265,21 @@ over_budget: []
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Matching query completes all three tools | 4 of 5 | MET (5/5) | All five matching runs returned search results, an outfit suggestion, and a fit card. |
+| 2 | Impossible query stops before the second tool | 5 of 5 | MET (5/5) | All five empty searches stopped after `search_listings`, returned a useful change message, and left `fit_card` as `None`. |
+| 3 | Selected item state is preserved | 5 of 5 | MET (5/5) | All five runs selected the same listing, and `run_agent()` reads that selected item from the session before calling `suggest_outfit`. |
+| 4 | Fit card contains item details | 4 of 5 | MET (5/5) | Every fit card in the five runs stayed within the required length and mentioned the item, price, and platform. |
+| 5 | Price ceiling is respected | 5 of 5 | MET (5/5) | All returned prices were at or below the requested $50 limit; the direct check produced an empty `over_budget` list. |
 
 **Diagnoses**
 
+No criteria were missed, so there is no repeated failure pattern to diagnose in
+the tools, loop branch, session state, or model output. The two 4-of-5 targets
+were conservative: criterion 1 allows for keyword-search phrasing to miss a
+listing, and criterion 4 allows for normal variation in model-generated
+captions. Both passed 5 of 5 in this run. Criterion 1 could reasonably be
+tightened to 5 of 5 in a future revision, but the current target remains the
+original target used for this evaluation.
 
 
 ---
