@@ -335,24 +335,40 @@ so the transport change is visible.
 
      `python run_eval.py --label after` -->
 
-**What I changed:**
+**What I changed:** I tightened the prompt in `tools.py::create_fit_card` so
+the model must return only a natural two-to-four sentence caption with the
+exact item title, price, platform, outfit, and style vibe. It must not add a
+heading or bullet points.
 
-**Which failure it was meant to fix:**
+**Which failure it was meant to fix:** The before run already met the fit-card
+criterion, but the diagnosis identified model-output variation as the main
+risk. This change was meant to make the required details and caption shape more
+consistent without changing the loop or search behavior.
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Matching query completes all three tools | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Impossible query stops before the second tool | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Selected item state is preserved | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card contains item details | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Price ceiling is respected | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Did it help, and how do I know:**
 
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
+It helped qualitatively, but it did not increase the numerical verdicts: the
+before run was already 5 of 5 for every criterion, and the after run was also 5
+of 5. The after fit cards were consistently caption-only two-sentence outputs
+that included the required details, so the prompt became clearer without
+changing search, branching, or session behavior.
+
+After-run evidence from `results/run_2026-10-11_1853_after.md`, produced by
+`run_eval.py::main`:
+
+```
+I just scored this Y2K Baby Tee — Butterfly Print on depop for $18.0. It gives off the ultimate early 2000s streetwear vibe when you style it with baggy straight-leg jeans, chunky white sneakers, and a black crossbody bag.
+```
 
 
 
